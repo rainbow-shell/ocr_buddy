@@ -1,0 +1,290 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    max-width: 800px;
+    width: 90%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+main {
+    padding: 40px;
+}
+
+.upload-section {
+    margin-bottom: 30px;
+}
+
+.drop-zone {
+    border: 3px dashed #ddd;
+    border-radius: 15px;
+    padding: 60px 20px;
+    text-align: center;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: #4CAF50;
+    background: #f0f8f0;
+    transform: translateY(-2px);
+}
+
+.drop-zone-content svg.upload-icon {
+    color: #4CAF50;
+    margin-bottom: 20px;
+}
+
+.drop-zone-content h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.drop-zone-content p {
+    color: #666;
+    margin: 15px 0;
+    font-size: 1.1rem;
+}
+
+.browse-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.browse-btn:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.file-info {
+    font-size: 0.9rem;
+    color: #999;
+    margin-top: 15px;
+}
+
+.loading-section {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 30px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-section h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.loading-section p {
+    color: #666;
+    font-size: 1rem;
+}
+
+.result-section {
+    text-align: center;
+}
+
+.result-section h3 {
+    font-size: 1.8rem;
+    color: #4CAF50;
+    margin-bottom: 30px;
+}
+
+.result-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.text-preview {
+    text-align: left;
+}
+
+.text-preview h4 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.preview-box {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+.download-section {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.download-btn,
+.new-file-btn,
+.try-again-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.download-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.download-btn:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.new-file-btn {
+    background: #2196F3;
+    color: white;
+}
+
+.new-file-btn:hover {
+    background: #1976D2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+.error-section {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.error-content svg.error-icon {
+    color: #f44336;
+    margin-bottom: 20px;
+}
+
+.error-section h3 {
+    font-size: 1.5rem;
+    color: #f44336;
+    margin-bottom: 15px;
+}
+
+.error-section p {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+.try-again-btn {
+    background: #ff9800;
+    color: white;
+}
+
+.try-again-btn:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 30px 20px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    main {
+        padding: 30px 20px;
+    }
+    
+    .drop-zone {
+        padding: 40px 15px;
+    }
+    
+    .result-content {
+        gap: 20px;
+    }
+    
+    .download-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .download-btn,
+    .new-file-btn,
+    .try-again-btn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+}
