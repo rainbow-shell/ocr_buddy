@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF OCR Extractor</title>
+    <title>OCR Buddy</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>PDF OCR Text Extractor</h1>
-            <p>Upload a PDF file to extract text using OCR technology</p>
+            <h1>OCR Buddy</h1>
+            <p>Your friendly PDF text extraction companion</p>
         </header>
 
         <main>
@@ -40,11 +40,26 @@
             <div id="resultSection" class="result-section" style="display: none;">
                 <h3>Processing Complete!</h3>
                 <div class="result-content">
-                    <div class="text-preview">
-                        <h4>Text Preview:</h4>
-                        <div id="textPreview" class="preview-box"></div>
+                    <div class="text-editor">
+                        <h4>Extracted Text (Editable):</h4>
+                        <textarea id="textEditor" class="text-editor-box" placeholder="Extracted text will appear here..."></textarea>
                     </div>
-                    <div class="download-section">
+                    <div class="action-section">
+                        <button id="cleanupBtn" class="cleanup-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h10z"></path>
+                                <path d="M6 5v15a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5"></path>
+                                <path d="M10 10v6"></path>
+                                <path d="M14 10v6"></path>
+                            </svg>
+                            Cleanup with AI
+                        </button>
+                        <button id="saveBtn" class="save-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Save Changes
+                        </button>
                         <button id="downloadBtn" class="download-btn">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

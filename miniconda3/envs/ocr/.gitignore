@@ -1,0 +1,44 @@
+# PDF files
+*.pdf
+
+# Text files (OCR output)
+*.txt
+
+# Upload and output directories
+uploads/
+outputs/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Flask instance folder and logs
+instance/
+*.log
+
+# Environment variables
+.env
+.flaskenv
+
+# Temporary files
+tmp/
+temp/

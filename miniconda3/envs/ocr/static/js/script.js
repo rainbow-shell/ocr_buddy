@@ -13,7 +13,9 @@ class OCRApp {
         this.loadingSection = document.getElementById('loadingSection');
         this.resultSection = document.getElementById('resultSection');
         this.errorSection = document.getElementById('errorSection');
-        this.textPreview = document.getElementById('textPreview');
+        this.textEditor = document.getElementById('textEditor');
+        this.cleanupBtn = document.getElementById('cleanupBtn');
+        this.saveBtn = document.getElementById('saveBtn');
         this.downloadBtn = document.getElementById('downloadBtn');
         this.newFileBtn = document.getElementById('newFileBtn');
         this.tryAgainBtn = document.getElementById('tryAgainBtn');
@@ -35,6 +37,8 @@ class OCRApp {
         this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
 
         // Button events
+        this.cleanupBtn.addEventListener('click', this.handleCleanup.bind(this));
+        this.saveBtn.addEventListener('click', this.handleSave.bind(this));
         this.downloadBtn.addEventListener('click', this.handleDownload.bind(this));
         this.newFileBtn.addEventListener('click', this.resetApp.bind(this));
         this.tryAgainBtn.addEventListener('click', this.resetApp.bind(this));
@@ -118,7 +122,7 @@ class OCRApp {
         this.errorSection.style.display = 'none';
         this.uploadSection.style.display = 'none';
         
-        this.textPreview.textContent = data.text_preview;
+        this.textEditor.value = data.extracted_text;
         this.outputFilename = data.output_file;
         this.resultSection.style.display = 'block';
     }
@@ -132,10 +136,104 @@ class OCRApp {
         this.errorSection.style.display = 'block';
     }
 
+    handleSave() {
+        if (!this.outputFilename) {
+            alert('No file to save.');
+            return;
+        }
+
+        const textContent = this.textEditor.value;
+        
+        // Disable save button during request
+        this.saveBtn.disabled = true;
+        this.saveBtn.textContent = 'Saving...';
+
+        fetch(`/save/${this.outputFilename}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: textContent })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success feedback
+                const originalText = this.saveBtn.textContent;
+                this.saveBtn.textContent = 'Saved!';
+                setTimeout(() => {
+                    this.saveBtn.textContent = 'Save Changes';
+                    this.saveBtn.disabled = false;
+                }, 2000);
+            } else {
+                alert('Error saving file: ' + (data.error || 'Unknown error'));
+                this.saveBtn.textContent = 'Save Changes';
+                this.saveBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error occurred while saving. Please try again.');
+            this.saveBtn.textContent = 'Save Changes';
+            this.saveBtn.disabled = false;
+        });
+    }
+
     handleDownload() {
         if (this.outputFilename) {
             window.location.href = `/download/${this.outputFilename}`;
         }
+    }
+
+    handleCleanup() {
+        const textContent = this.textEditor.value;
+        
+        if (!textContent.trim()) {
+            alert('No text to clean up.');
+            return;
+        }
+
+        // Disable cleanup button during request
+        this.cleanupBtn.disabled = true;
+        
+        // Check text length to show appropriate message
+        if (textContent.length > 10000) {
+            this.cleanupBtn.textContent = 'Processing large file...';
+        } else {
+            this.cleanupBtn.textContent = 'Cleaning up...';
+        }
+
+        fetch('/cleanup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: textContent })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Replace text with cleaned version
+                this.textEditor.value = data.cleaned_text;
+                
+                // Show success feedback
+                this.cleanupBtn.textContent = 'Cleaned!';
+                setTimeout(() => {
+                    this.cleanupBtn.textContent = 'Cleanup with AI';
+                    this.cleanupBtn.disabled = false;
+                }, 2000);
+            } else {
+                alert('Error cleaning up text: ' + (data.error || 'Unknown error'));
+                this.cleanupBtn.textContent = 'Cleanup with AI';
+                this.cleanupBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error occurred during cleanup. Please try again.');
+            this.cleanupBtn.textContent = 'Cleanup with AI';
+            this.cleanupBtn.disabled = false;
+        });
     }
 
     resetApp() {
