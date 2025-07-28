@@ -81,9 +81,14 @@ def split_text_into_chunks(text, max_chars=10000):
     
     return chunks
 
-def cleanup_text_chunk(chunk):
+def cleanup_text_chunk(chunk, api_key=None):
     """Clean up a single chunk of OCR text using OpenAI API"""
-    response = client.chat.completions.create(
+    # Use provided API key or fall back to environment variable
+    openai_client = client
+    if api_key:
+        openai_client = OpenAI(api_key=api_key)
+    
+    response = openai_client.chat.completions.create(
         model="gpt-4",
         messages=[
             {
@@ -128,25 +133,25 @@ Respond with only the improved text, in paragraph form, preserving intended stru
     
     return response.choices[0].message.content.strip()
 
-def cleanup_ocr_text(raw_text):
+def cleanup_ocr_text(raw_text, api_key=None):
     """Clean up OCR text using OpenAI API, splitting into chunks if necessary"""
     try:
-        # Check if API key is available
-        if not os.environ.get("OPENAI_API_KEY"):
-            raise Exception("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+        # Check if API key is available (either provided or in environment)
+        if not api_key and not os.environ.get("OPENAI_API_KEY"):
+            raise Exception("OpenAI API key not found. Please provide an API key or set OPENAI_API_KEY environment variable.")
         
         # Split text into chunks if it's too long
         chunks = split_text_into_chunks(raw_text, max_chars=10000)
         
         # If only one chunk, process normally
         if len(chunks) == 1:
-            return cleanup_text_chunk(chunks[0])
+            return cleanup_text_chunk(chunks[0], api_key)
         
         # Process multiple chunks
         cleaned_chunks = []
         for i, chunk in enumerate(chunks):
             try:
-                cleaned_chunk = cleanup_text_chunk(chunk)
+                cleaned_chunk = cleanup_text_chunk(chunk, api_key)
                 cleaned_chunks.append(cleaned_chunk)
             except Exception as chunk_error:
                 # If a chunk fails, add the original chunk to maintain content
@@ -241,8 +246,11 @@ def cleanup_text():
         if not raw_text.strip():
             return jsonify({'error': 'Empty text provided'}), 400
         
+        # Get API key from request data (user-provided) or use environment variable
+        api_key = data.get('api_key')
+        
         # Clean up the text using OpenAI
-        cleaned_text = cleanup_ocr_text(raw_text)
+        cleaned_text = cleanup_ocr_text(raw_text, api_key)
         
         return jsonify({
             'success': True,

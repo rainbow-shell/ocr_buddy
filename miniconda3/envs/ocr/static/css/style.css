@@ -42,6 +42,133 @@ header p {
     opacity: 0.9;
 }
 
+/* API Key Section */
+.api-key-section {
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+
+.api-key-toggle {
+    text-align: center;
+}
+
+.api-key-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.api-key-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.api-key-input {
+    margin-top: 15px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.api-key-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.api-key-field {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.api-key-field:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.api-key-field::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.api-key-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.save-api-key-btn,
+.clear-api-key-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.save-api-key-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.save-api-key-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+}
+
+.clear-api-key-btn {
+    background: #f44336;
+    color: white;
+}
+
+.clear-api-key-btn:hover {
+    background: #da190b;
+    transform: translateY(-1px);
+}
+
+.api-key-info {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.api-key-info a {
+    color: #9966ff;
+    text-decoration: none;
+}
+
+.api-key-info a:hover {
+    text-decoration: underline;
+}
+
 main {
     padding: 40px;
     background: #111111;
@@ -154,6 +281,38 @@ main {
     display: flex;
     flex-direction: column;
     gap: 30px;
+}
+
+.text-editor {
+    text-align: left;
+}
+
+.text-editor h4 {
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.text-editor-box {
+    background: #1a1a1a;
+    border: 1px solid #444444;
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 300px;
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #ffffff;
+    white-space: pre-wrap;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.text-editor-box:focus {
+    outline: none;
+    border-color: #9966ff;
+    box-shadow: 0 0 5px rgba(153, 102, 255, 0.3);
 }
 
 .text-preview {
@@ -335,5 +494,15 @@ main {
         width: 100%;
         max-width: 200px;
         justify-content: center;
+    }
+    
+    .api-key-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .save-api-key-btn,
+    .clear-api-key-btn {
+        width: 100%;
     }
 }

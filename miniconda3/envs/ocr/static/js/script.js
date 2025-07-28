@@ -3,6 +3,7 @@ class OCRApp {
         this.initializeElements();
         this.attachEventListeners();
         this.outputFilename = null;
+        this.initializeApiKey();
     }
 
     initializeElements() {
@@ -20,6 +21,13 @@ class OCRApp {
         this.newFileBtn = document.getElementById('newFileBtn');
         this.tryAgainBtn = document.getElementById('tryAgainBtn');
         this.errorMessage = document.getElementById('errorMessage');
+        
+        // API Key elements
+        this.apiKeyToggle = document.getElementById('apiKeyToggle');
+        this.apiKeyInput = document.getElementById('apiKeyInput');
+        this.apiKeyField = document.getElementById('apiKeyField');
+        this.saveApiKeyBtn = document.getElementById('saveApiKey');
+        this.clearApiKeyBtn = document.getElementById('clearApiKey');
     }
 
     attachEventListeners() {
@@ -42,6 +50,11 @@ class OCRApp {
         this.downloadBtn.addEventListener('click', this.handleDownload.bind(this));
         this.newFileBtn.addEventListener('click', this.resetApp.bind(this));
         this.tryAgainBtn.addEventListener('click', this.resetApp.bind(this));
+        
+        // API Key events
+        this.apiKeyToggle.addEventListener('click', this.toggleApiKeyInput.bind(this));
+        this.saveApiKeyBtn.addEventListener('click', this.saveApiKey.bind(this));
+        this.clearApiKeyBtn.addEventListener('click', this.clearApiKey.bind(this));
     }
 
     handleDragOver(e) {
@@ -193,6 +206,14 @@ class OCRApp {
             return;
         }
 
+        // Check if API key is available
+        const apiKey = this.getApiKey();
+        if (!apiKey) {
+            alert('OpenAI API key is required for text cleanup. Please configure your API key first.');
+            this.showApiKeyInput();
+            return;
+        }
+
         // Disable cleanup button during request
         this.cleanupBtn.disabled = true;
         
@@ -208,7 +229,10 @@ class OCRApp {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ text: textContent })
+            body: JSON.stringify({ 
+                text: textContent,
+                api_key: apiKey
+            })
         })
         .then(response => response.json())
         .then(data => {
@@ -245,6 +269,108 @@ class OCRApp {
         this.fileInput.value = '';
         this.outputFilename = null;
         this.dropZone.classList.remove('dragover');
+    }
+
+    // API Key Management Methods
+    initializeApiKey() {
+        // Load saved API key on startup
+        const savedKey = this.getApiKey();
+        if (savedKey) {
+            this.apiKeyField.value = savedKey;
+            this.updateToggleButtonText(true);
+        }
+    }
+
+    toggleApiKeyInput() {
+        const isVisible = this.apiKeyInput.style.display !== 'none';
+        if (isVisible) {
+            this.apiKeyInput.style.display = 'none';
+        } else {
+            this.showApiKeyInput();
+        }
+    }
+
+    showApiKeyInput() {
+        this.apiKeyInput.style.display = 'block';
+        this.apiKeyField.focus();
+    }
+
+    saveApiKey() {
+        const apiKey = this.apiKeyField.value.trim();
+        
+        if (!apiKey) {
+            alert('Please enter an API key.');
+            return;
+        }
+
+        if (!apiKey.startsWith('sk-')) {
+            alert('OpenAI API keys should start with "sk-".');
+            return;
+        }
+
+        // Save to localStorage
+        localStorage.setItem('openai_api_key', apiKey);
+        
+        // Update UI
+        this.updateToggleButtonText(true);
+        this.apiKeyInput.style.display = 'none';
+        
+        // Show success feedback
+        const originalText = this.saveApiKeyBtn.textContent;
+        this.saveApiKeyBtn.textContent = 'Saved!';
+        setTimeout(() => {
+            this.saveApiKeyBtn.textContent = originalText;
+        }, 2000);
+    }
+
+    clearApiKey() {
+        // Clear from localStorage
+        localStorage.removeItem('openai_api_key');
+        
+        // Clear the input field
+        this.apiKeyField.value = '';
+        
+        // Update UI
+        this.updateToggleButtonText(false);
+        this.apiKeyInput.style.display = 'none';
+        
+        // Show success feedback
+        const originalText = this.clearApiKeyBtn.textContent;
+        this.clearApiKeyBtn.textContent = 'Cleared!';
+        setTimeout(() => {
+            this.clearApiKeyBtn.textContent = originalText;
+        }, 2000);
+    }
+
+    getApiKey() {
+        return localStorage.getItem('openai_api_key');
+    }
+
+    updateToggleButtonText(hasKey) {
+        const button = this.apiKeyToggle;
+        if (hasKey) {
+            button.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <circle cx="12" cy="16" r="1"></circle>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                API Key Configured ✓
+            `;
+            button.style.background = 'rgba(76, 175, 80, 0.2)';
+            button.style.borderColor = 'rgba(76, 175, 80, 0.3)';
+        } else {
+            button.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <circle cx="12" cy="16" r="1"></circle>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Configure OpenAI API Key
+            `;
+            button.style.background = 'rgba(255, 255, 255, 0.1)';
+            button.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        }
     }
 }
 

@@ -11,6 +11,30 @@
         <header>
             <h1>OCR Buddy</h1>
             <p>Your friendly PDF text extraction companion</p>
+            
+            <!-- API Key Section -->
+            <div class="api-key-section">
+                <div class="api-key-toggle">
+                    <button id="apiKeyToggle" class="api-key-toggle-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <circle cx="12" cy="16" r="1"></circle>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Configure OpenAI API Key
+                    </button>
+                </div>
+                <div id="apiKeyInput" class="api-key-input" style="display: none;">
+                    <div class="api-key-form">
+                        <input type="password" id="apiKeyField" placeholder="Enter your OpenAI API key (sk-...)" class="api-key-field">
+                        <div class="api-key-buttons">
+                            <button id="saveApiKey" class="save-api-key-btn">Save</button>
+                            <button id="clearApiKey" class="clear-api-key-btn">Clear</button>
+                        </div>
+                    </div>
+                    <p class="api-key-info">Your API key is stored locally and used for AI text cleanup. <a href="https://platform.openai.com/api-keys" target="_blank">Get your API key here</a></p>
+                </div>
+            </div>
         </header>
 
         <main>
