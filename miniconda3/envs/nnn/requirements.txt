@@ -1,0 +1,22 @@
+# Commercial Real Estate Email Scanner Requirements
+
+# Core dependencies
+anthropic>=0.25.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+pillow>=10.0.0
+
+# OCR dependencies
+pytesseract>=0.3.10
+opencv-python>=4.8.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Email processing
+email-reply-parser>=0.5.12
+
+# Optional: For better email parsing
+chardet>=5.2.0
+python-magic>=0.4.27

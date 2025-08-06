@@ -1,0 +1,101 @@
+# Commercial Real Estate Email Scanner - Git Ignore
+
+# Test and sample files
+marketing-emails/
+*.eml
+*.pdf
+column_descriptions.txt
+pipeline.csv
+
+# Output files
+*.csv
+*_test.csv
+*_output.csv
+pipeline_deals.csv
+neptune_*.csv
+test_*.csv
+processing_summary.txt
+summary.txt
+
+# Temporary files
+temp/
+images_*/
+*.tmp
+
+# Environment and API keys
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# OCR temporary files
+tesseract_*/
+ocr_temp/
+downloaded_images/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Backup files
+*.bak
+*.backup
+*.orig
