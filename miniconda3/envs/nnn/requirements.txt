@@ -1,7 +1,7 @@
 # Commercial Real Estate Email Scanner Requirements
 
 # Core dependencies
-anthropic>=0.25.0
+google-generativeai>=0.3.0
 beautifulsoup4>=4.12.0
 requests>=2.31.0
 pillow>=10.0.0

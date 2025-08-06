@@ -3,25 +3,47 @@ import re
 import logging
 from typing import Dict, Optional, List
 from datetime import datetime
-import anthropic
+import google.generativeai as genai
 import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class LLMFieldExtractor:
-    """Extract commercial real estate fields from email content using Anthropic Claude."""
+    """Extract commercial real estate fields from email content using Google Gemini."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "claude-3-opus-20240229"):
-        """Initialize LLM extractor with Anthropic API configuration."""
-        self.api_key = api_key or os.getenv('ANTHROPIC_API_KEY')
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-pro"):
+        """Initialize LLM extractor with Google Gemini API configuration."""
+        self.api_key = api_key or os.getenv('GOOGLE_API_KEY')
         self.model = model
         
         if self.api_key:
-            self.client = anthropic.Anthropic(api_key=self.api_key)
+            genai.configure(api_key=self.api_key)
+            
+            # Configure safety settings to be more permissive for business content
+            safety_settings = [
+                {
+                    "category": "HARM_CATEGORY_HARASSMENT",
+                    "threshold": "BLOCK_ONLY_HIGH"
+                },
+                {
+                    "category": "HARM_CATEGORY_HATE_SPEECH",
+                    "threshold": "BLOCK_ONLY_HIGH"
+                },
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_ONLY_HIGH"
+                },
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_ONLY_HIGH"
+                }
+            ]
+            
+            self.client = genai.GenerativeModel(model, safety_settings=safety_settings)
             logger.info(f"LLM extractor initialized with model: {model}")
         else:
-            logger.warning("No Anthropic API key provided")
+            logger.warning("No Google API key provided")
             self.client = None
     
     def create_extraction_prompt(self, email_content: str) -> str:
@@ -82,37 +104,121 @@ Respond with ONLY the JSON object, no additional text."""
         return prompt
     
     def extract_fields(self, email_content: str) -> Dict:
-        """Extract fields using Claude analysis."""
+        """Extract fields using Gemini analysis."""
         if not self.client:
-            logger.error("No Anthropic client available for LLM extraction")
+            logger.error("No Gemini client available for LLM extraction")
             return self._get_empty_fields()
         
         try:
-            prompt = self.create_extraction_prompt(email_content)
+            # Clean email content more aggressively for Gemini
+            cleaned_content = self._clean_for_gemini(email_content)
+            prompt = self.create_extraction_prompt(cleaned_content)
             
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=1500,
+            # Configure generation parameters
+            generation_config = genai.types.GenerationConfig(
                 temperature=0.1,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
+                max_output_tokens=2000,
+                candidate_count=1,
             )
             
-            extracted_text = response.content[0].text.strip()
+            response = self.client.generate_content(
+                prompt,
+                generation_config=generation_config
+            )
+            
+            # Check if response was blocked by safety filters
+            if not response.candidates or not response.candidates[0].content.parts:
+                finish_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN"
+                logger.warning(f"Gemini response blocked or empty. Finish reason: {finish_reason}")
+                return self._get_empty_fields()
+            
+            extracted_text = response.text.strip()
+            
+            # Clean up markdown code blocks if present
+            if extracted_text.startswith('```json') and extracted_text.endswith('```'):
+                # Remove markdown code blocks
+                extracted_text = extracted_text[7:-3].strip()  # Remove ```json from start and ``` from end
+            elif extracted_text.startswith('```') and extracted_text.endswith('```'):
+                # Remove generic code blocks
+                extracted_text = extracted_text[3:-3].strip()
             
             # Parse JSON response
             try:
                 extracted_fields = json.loads(extracted_text)
-                logger.info("Successfully extracted fields using Claude")
+                logger.info("Successfully extracted fields using Gemini")
                 return self._validate_and_clean_fields(extracted_fields)
             except json.JSONDecodeError:
-                logger.error(f"Failed to parse Claude JSON response: {extracted_text}")
+                # Try to repair truncated JSON
+                logger.warning("JSON parsing failed, attempting to repair truncated response")
+                repaired_json = self._repair_truncated_json(extracted_text)
+                if repaired_json:
+                    try:
+                        extracted_fields = json.loads(repaired_json)
+                        logger.info("Successfully repaired and parsed JSON")
+                        return self._validate_and_clean_fields(extracted_fields)
+                    except json.JSONDecodeError:
+                        pass
+                
+                logger.error(f"Failed to parse Gemini JSON response: {extracted_text}")
                 return self._get_empty_fields()
                 
         except Exception as e:
-            logger.error(f"Claude extraction failed: {e}")
+            logger.error(f"Gemini extraction failed: {e}")
             return self._get_empty_fields()
+    
+    def _clean_for_gemini(self, content: str) -> str:
+        """Clean content for Gemini to avoid safety filter issues."""
+        # Remove URLs which might trigger safety filters
+        content = re.sub(r'https?://[^\s<>"{}|\\^`[\]]+', '[URL]', content)
+        
+        # Remove long encoded URL parameters
+        content = re.sub(r'%[0-9A-Fa-f]{2}', '', content)
+        
+        # Remove email headers and technical content
+        lines = content.split('\n')
+        cleaned_lines = []
+        skip_headers = True
+        
+        for line in lines:
+            line = line.strip()
+            # Skip empty lines at start
+            if not line and skip_headers:
+                continue
+            # Skip header lines
+            if skip_headers and ('Received:' in line or 'X-' in line or 'Content-' in line):
+                continue
+            # Found content, stop skipping headers
+            if line and not line.startswith(('Received:', 'X-', 'Content-', 'From:', 'To:', 'Subject:')):
+                skip_headers = False
+            
+            if not skip_headers:
+                cleaned_lines.append(line)
+        
+        cleaned_content = '\n'.join(cleaned_lines)
+        
+        # Truncate if still too long
+        if len(cleaned_content) > 12000:
+            logger.info("Truncating long email content for Gemini processing")
+            cleaned_content = cleaned_content[:12000] + "...[TRUNCATED]"
+        
+        return cleaned_content
+    
+    def _repair_truncated_json(self, json_text: str) -> Optional[str]:
+        """Attempt to repair truncated JSON by adding missing closing braces."""
+        try:
+            # Count opening and closing braces
+            open_braces = json_text.count('{')
+            close_braces = json_text.count('}')
+            
+            if open_braces > close_braces:
+                # Add missing closing braces
+                missing_braces = open_braces - close_braces
+                repaired = json_text + '}' * missing_braces
+                return repaired
+            
+            return None
+        except Exception:
+            return None
     
     def _validate_and_clean_fields(self, fields: Dict) -> Dict:
         """Validate and clean extracted fields."""

@@ -29,13 +29,13 @@ class EmailScanner:
     """Main class for processing commercial real estate marketing emails."""
     
     def __init__(self, 
-                 anthropic_api_key: Optional[str] = None,
+                 google_api_key: Optional[str] = None,
                  tesseract_path: Optional[str] = None,
-                 model: str = "claude-3-opus-20240229"):
+                 model: str = "gemini-2.5-pro"):
         """Initialize the email scanner with required components."""
         self.email_parser = EmailParser()
         self.ocr_processor = OCRProcessor(tesseract_path)
-        self.llm_extractor = LLMFieldExtractor(anthropic_api_key, model)
+        self.llm_extractor = LLMFieldExtractor(google_api_key, model)
         self.csv_generator = CSVGenerator()
         
         # Processing statistics
@@ -252,8 +252,8 @@ Examples:
   # Process entire directory
   python email_scanner.py -d marketing-emails/ -o pipeline_deals.csv -s summary.txt
   
-  # Use custom Tesseract path
-  python email_scanner.py -d marketing-emails/ -o deals.csv --tesseract /usr/local/bin/tesseract
+  # Use custom API key and Tesseract path
+  python email_scanner.py -d marketing-emails/ -o deals.csv --google-key YOUR_KEY --tesseract /usr/local/bin/tesseract
         """
     )
     
@@ -267,9 +267,9 @@ Examples:
     parser.add_argument('-s', '--summary', help='Summary report file path')
     
     # Configuration options
-    parser.add_argument('--anthropic-key', help='Anthropic API key (or set ANTHROPIC_API_KEY env var)')
+    parser.add_argument('--google-key', help='Google API key (or set GOOGLE_API_KEY env var)')
     parser.add_argument('--tesseract', help='Path to Tesseract executable')
-    parser.add_argument('--model', default='claude-3-opus-20240229', help='Claude model to use')
+    parser.add_argument('--model', default='gemini-2.5-pro', help='Gemini model to use')
     parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
     
     args = parser.parse_args()
@@ -280,7 +280,7 @@ Examples:
     
     # Initialize scanner
     scanner = EmailScanner(
-        anthropic_api_key=args.anthropic_key,
+        google_api_key=args.google_key,
         tesseract_path=args.tesseract,
         model=args.model
     )

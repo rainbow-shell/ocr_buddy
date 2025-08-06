@@ -85,12 +85,12 @@ def verify_installation():
         print("  OCR functionality will be disabled")
     
     # Check API key
-    anthropic_key = os.getenv('ANTHROPIC_API_KEY')
-    if anthropic_key:
-        print("✓ Anthropic API key found in environment")
+    google_key = os.getenv('GOOGLE_API_KEY')
+    if google_key:
+        print("✓ Google API key found in environment")
     else:
-        print("⚠ Anthropic API key not found in ANTHROPIC_API_KEY environment variable")
-        print("  You'll need to provide it with --anthropic-key option")
+        print("⚠ Google API key not found in GOOGLE_API_KEY environment variable")
+        print("  You'll need to provide it with --google-key option")
     
     return True
 
@@ -102,8 +102,8 @@ def create_example_config():
     env_example = """# Commercial Real Estate Email Scanner Configuration
 # Copy this to .env and fill in your API key
 
-# Required: Anthropic API key for Claude
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+# Required: Google API key for Gemini
+GOOGLE_API_KEY=your_google_api_key_here
 
 # Optional: Custom Tesseract path (if not in system PATH)
 # TESSERACT_PATH=/usr/local/bin/tesseract
@@ -143,7 +143,7 @@ def main():
     create_example_config()
     
     print("\nNext steps:")
-    print("1. Set your Anthropic API key: export ANTHROPIC_API_KEY='your_key'")
+    print("1. Set your Google API key: export GOOGLE_API_KEY='your_key'")
     print("2. Test the scanner: python email_scanner.py -f sample.eml -o test.csv")
     print("3. Process your emails: python email_scanner.py -d marketing-emails/ -o deals.csv")
 
